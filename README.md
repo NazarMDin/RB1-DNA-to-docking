@@ -128,7 +128,7 @@ MQKQKMNDSMDTSNKEEK
 
 ## Step 4: AlphaFold2 Structure Prediction
 
-**Script:** `scripts/step4_alphafold2.py`  
+**Script:** `scripts/step4_alphafold2.ipynb`  
 **Tool:** ColabFold — https://colab.research.google.com/github/sokrypton/ColabFold/blob/main/AlphaFold2.ipynb
 
 ### Method
@@ -190,7 +190,7 @@ The structure shows the dense helical core of the Pocket A and B domains (ribbon
 
 ## Step 5: GNINA Molecular Docking
 
-**Script:** `scripts/step5_gnina_docking.py`  
+**Script:** `scripts/step5_gnina_docking.ipynb`  
 **Tool:** GNINA v1.1 — https://github.com/gnina/gnina
 
 ### Ligand: Palbociclib (Ibrance)
