@@ -1,0 +1,47 @@
+AlphaFold2 Structure Prediction Report — RB1 / pRb
+====================================================
+Tool     : ColabFold (AlphaFold2 v2.3)
+UniProt  : P06400
+Sequence : NP_000312.2 isoform 1 (928 aa)
+Date     : 2025
+
+ColabFold Settings
+------------------
+  MSA mode   : mmseqs2_uniref_env
+  Pair mode  : unpaired_paired
+  Models     : 5
+  Recycles   : 3
+  Job name   : RB1_pRb
+
+pLDDT Confidence Results
+-------------------------
+  Peak pLDDT              : ~97  (structured helical domains)
+  Structured domains      : 90–97  (positions ~75–700)
+  Disordered loop regions : 25–40  (linkers between helices — expected)
+  C-terminus (800–928)    : 30–65  (partially disordered — expected)
+  All 5 models agree      : YES — consistent and reliable prediction
+  MSA depth               : 1,000–1,600 sequences per position (excellent)
+
+Best Model
+----------
+  Rank    : rank_001
+  File    : test_c6274_0_unrelaxed_rank_001_alphafold2_ptm_model_*.pdb
+  Used as : receptor for GNINA docking in Step 5
+
+PAE (Predicted Alignment Error)
+---------------------------------
+  rank_1 blue diagonal blocks = confident intra-domain residue positions
+  Red off-diagonal regions    = flexible inter-domain spacer (expected for pRb)
+
+Structure Validation
+---------------------
+  Dense helical core (Pocket A/B domains) confirmed in RCSB 3D viewer
+  Disordered loops visible as thin coil lines — consistent with NMR data
+  Architecture consistent with known PDB structures: 2AZE, 4ELJ
+
+Output Files
+-------------
+  figures/plddt.png        — pLDDT per residue plot
+  figures/pae.png          — PAE heatmap (5 models)
+  figures/coverage.png     — MSA sequence coverage
+  figures/rcsb_structure.png — 3D structure screenshot (RCSB viewer)

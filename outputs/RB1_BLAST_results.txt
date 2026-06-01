@@ -1,0 +1,19 @@
+BLAST Search Results — RB1 Protein (NP_000312.2)
+Program : blastp
+Database: NCBI nr
+URL     : https://blast.ncbi.nlm.nih.gov/
+============================================================
+
+Top Hit:
+  Accession : NP_000312.2
+  Name      : retinoblastoma-associated protein isoform 1
+  Organism  : Homo sapiens
+  Identity  : 100%
+  E-value   : 0.0
+  Length    : 928 aa
+
+Protein Information:
+  UniProt   : P06400
+  Gene      : RB1
+  Function  : Tumor suppressor, G1/S checkpoint regulator
+  Domains   : N-terminal, Pocket A (RB_A), Spacer, Pocket B (RB_B), C-terminal
