@@ -1,0 +1,322 @@
+# RB1 Gene Bioinformatics Pipeline
+### Retinoblastoma Protein (pRb) — From DNA to Molecular Docking
+
+**Gene:** RB1 (Retinoblastoma 1) | **Type:** Tumor Suppressor (Loss-of-Function)  
+**Protein:** pRb — Retinoblastoma-associated protein | **UniProt:** P06400  
+**Protein Accession:** NP_000312.2 (isoform 1) | **Chromosome:** 13q14.2
+
+---
+
+## Table of Contents
+1. [Gene Overview](#gene-overview)
+2. [Step 1: DNA Sequence Retrieval](#step-1-dna-sequence-retrieval)
+3. [Step 2: DNA → mRNA Conversion](#step-2-dna--mrna-conversion)
+4. [Step 3: BLAST & Protein Identification](#step-3-blast--protein-identification)
+5. [Step 4: AlphaFold2 Structure Prediction](#step-4-alphafold2-structure-prediction)
+6. [Step 5: GNINA Molecular Docking](#step-5-gnina-molecular-docking)
+7. [Repository Structure](#repository-structure)
+8. [How to Run](#how-to-run)
+9. [References](#references)
+
+---
+
+## Gene Overview
+
+**RB1** encodes the **Retinoblastoma protein (pRb)**, the master regulator of the G1/S cell cycle checkpoint and one of the most important tumor suppressor genes in human cancer biology. It was the first tumor suppressor gene ever discovered.
+
+| Property | Value |
+|---|---|
+| Gene | RB1 |
+| Protein | pRb (Retinoblastoma-associated protein) |
+| Protein Accession | NP_000312.2 (isoform 1) |
+| UniProt | P06400 |
+| Chromosome | 13q14.2 |
+| Protein Length | 928 amino acids |
+| Molecular Weight | ~106 kDa |
+| Mutation Type | Loss-of-function (both alleles — Two-Hit Hypothesis) |
+| Associated Cancers | Retinoblastoma, Osteosarcoma, SCLC, Breast cancer |
+
+**Mechanism:** In its hypophosphorylated form, pRb binds E2F transcription factors and blocks S-phase gene expression. CDK4/6–cyclin D phosphorylates pRb during G1, releasing E2F and allowing cell division. Loss of RB1 removes this checkpoint entirely.
+
+---
+
+## Step 1: DNA Sequence Retrieval
+
+**Script:** `scripts/step1_dna_sequence.py`
+
+The RB1 DNA sequence was retrieved directly from the **NCBI Nucleotide database** by searching for gene RB1 in *Homo sapiens* and downloading the FASTA file. The corresponding mRNA reference sequence is **NM_000321**.
+
+```
+Source  : NCBI Nucleotide (https://www.ncbi.nlm.nih.gov/nuccore/)
+Gene    : RB1 — Homo sapiens
+Format  : FASTA (.fasta)
+Output  : outputs/RB1_DNA.fasta
+```
+
+**Output file:** `outputs/RB1_DNA.fasta`
+
+---
+
+## Step 2: DNA → mRNA Conversion
+
+**Script:** `scripts/step2_dna_to_mrna.py`
+
+The DNA coding sequence was converted to mRNA by replacing every thymine (T) with uracil (U), simulating the transcription process:
+
+```python
+input_file  = "outputs/RB1_DNA.fasta"
+output_file = "outputs/RB1_mRNA.fasta"
+
+with open(input_file, "r") as infile, open(output_file, "w") as outfile:
+    for line in infile:
+        if line.startswith(">"):        # keep FASTA header unchanged
+            outfile.write(line)
+        else:                           # convert T → U on sequence lines
+            rna_seq = line.strip().upper().replace("T", "U")
+            outfile.write(rna_seq + "\n")
+
+print(f"RNA FASTA file saved as: {output_file}")
+```
+
+**Conversion rule:** Every `T` → `U` (thymine → uracil)
+
+**Output file:** `outputs/RB1_mRNA.fasta`
+
+---
+
+## Step 3: BLAST & Protein Identification
+
+**Script:** `scripts/step3_blast_protein.py`
+
+The protein sequence was retrieved from **NCBI Protein** using accession **NP_000312.2** and BLASTed (blastp against nr database) to confirm identity.
+
+### Protein Sequence (NP_000312.2)
+
+```
+>NP_000312.2 retinoblastoma-associated protein isoform 1 [Homo sapiens]
+MPPKTPRKTAATAAAAAAEPPAPPPPPPPEEDPEQDSGPEDLPLVRLEFEETEEPDFTALCQKLKIPDHV
+RERAWLTWEKVSSVDGVLGGYIQKKKELWGICIFIAAVDLDEMSFTFTELQKNIEISVHKFFNLLKEIDT
+STKVDNAMSRLLKKYDVLFALFSKLERTCELIYLTQPSSSISTEINSALVLKVSWITFLLAKGEVLQMED
+DLVISFQLMLCVLDYFIKLSPPMLLKEPYKTAVIPINGSPRTPRRGQNRSARIAKQLENDTRIIEVLCKE
+HECNIDEVKNVYFKNFIPFMNSLGLVTSNGLPEVENLSKRYEEIYLKNKDLDARLFLDHDKTLQTDSIDS
+FETQRTPRKSNLDEEVNVIPPHTPVRTVMNTIQQLMMILNSASDQPSENLISYFNNCTVNPKESILKRVK
+DIGYIFKEKFAKAVGQGCVEIGSQRYKLGVRLYYRVMESMLKSEEERLSIQNFSKLLNDNIFHMSLLACA
+LEVVMATYSRSTSQNLDSGTDLSFPWILNVLNLKAFDFYKVIESFIKAEGNLTREMIKHLERCEHRIMES
+LAWLSDSPLFDLIKQSKDREGPTDHLESACPLNLPLQNNHTAADMYLSPVRSPKKKGSTTRVNSTANAET
+QATSAFQTQKPLKSTSLSLFYKKVYRLAYLRLNTLCERLLSEHPELEHIIWTLFQHTLQNEYELMRDRHL
+DQIMMCSMYGICKVKNIDLKFKIIVTAYKDLPHAVQETFKRVLIKEEEYDSIIVFYNSVFMQRLKTNILQ
+YASTRPPTLSPIPHIPRSPYKFPSSPLRIPGGNIYISPLKSPYKISEGLPTPTKMTPRSRILVSIGESFG
+TSEKFQKINQMVCNSDRVLKRSAEGSNPPKPLKKLRFDIEGSDEADGSKHLPGESKFQQKLAEMTSTRTR
+MQKQKMNDSMDTSNKEEK
+```
+
+### Protein Identity
+
+| Field | Value |
+|---|---|
+| Protein Name | Retinoblastoma-associated protein |
+| Short Name | pRb |
+| Accession | NP_000312.2 |
+| Isoform | 1 (canonical) |
+| Organism | Homo sapiens |
+| Length | 928 amino acids |
+| UniProt | P06400 |
+
+**Output files:** `outputs/RB1_protein.fasta`, `outputs/RB1_BLAST_results.txt`
+
+---
+
+## Step 4: AlphaFold2 Structure Prediction
+
+**Script:** `scripts/step4_alphafold2.py`  
+**Tool:** ColabFold — https://colab.research.google.com/github/sokrypton/ColabFold/blob/main/AlphaFold2.ipynb
+
+### Method
+
+The full 928 aa pRb sequence was submitted to **ColabFold** using:
+- MSA mode: `mmseqs2_uniref_env`
+- Models: 5 predicted models ranked by pLDDT
+- Pair mode: `unpaired_paired`
+- Seed: default
+
+### pLDDT Confidence Plot
+
+![pLDDT per position](figures/plddt.png)
+
+**Interpretation:**
+- Structured domains (positions ~75–700): pLDDT **90–97** — very high confidence
+- Disordered loop regions (sharp dips to 25–40): expected, these are flexible linkers between helices
+- C-terminus (positions ~800–928): pLDDT 30–65 — partially disordered, consistent with known biology
+- All 5 models agree closely — prediction is consistent and reliable
+
+### Sequence Coverage
+
+![Sequence coverage](figures/coverage.png)
+
+**Interpretation:**
+- 1,000–1,600 homologous sequences aligned per position — excellent MSA depth
+- Orange/teal coloring indicates moderate-to-high identity homologs were found
+- Coverage dips align exactly with pLDDT dips — confirming those regions are genuinely disordered
+
+### Predicted Alignment Error (PAE)
+
+![PAE heatmap](figures/pae.png)
+
+**Interpretation:**
+- **Blue diagonal blocks** (rank_1, rank_2): high confidence in intra-domain residue positions
+- **Red off-diagonal regions**: uncertainty in relative domain positioning — expected because the disordered spacer acts as a flexible hinge between Pocket A and Pocket B
+- rank_1 shows the most confident prediction — used as best model
+
+### 3D Structure (RCSB Viewer)
+
+![pRb 3D structure](figures/rcsb_structure.png)
+
+The structure shows the dense helical core of the Pocket A and B domains (ribbons) and the disordered loop regions extending outward (thin lines) — exactly consistent with known pRb architecture.
+
+### Summary
+
+| Metric | Result |
+|---|---|
+| Tool | ColabFold (AlphaFold2) |
+| Best model | rank_001 |
+| Peak pLDDT | ~97 (structured domains) |
+| MSA depth | 1,000–1,600 sequences |
+| Model agreement | All 5 ranks consistent |
+| Validation | Intra-domain PAE confirms folded Pocket A/B |
+
+**Output files:** `outputs/AlphaFold2_report.txt`, `figures/plddt.png`, `figures/pae.png`, `figures/coverage.png`
+
+---
+
+## Step 5: GNINA Molecular Docking
+
+**Script:** `scripts/step5_gnina_docking.py`  
+**Tool:** GNINA v1.1 — https://github.com/gnina/gnina
+
+### Ligand: Palbociclib (Ibrance)
+
+| Property | Value |
+|---|---|
+| Drug name | Palbociclib (Ibrance) |
+| PubChem CID | 5330286 |
+| Class | CDK4/6 inhibitor |
+| MW | 447.54 Da |
+| Clinical use | HR+/HER2− advanced breast cancer |
+| Rationale | Prevents CDK4/6 from phosphorylating pRb → keeps pRb active → re-activates RB1 checkpoint |
+
+### GNINA Command
+
+```bash
+./gnina \
+    -r receptor.pdb \
+    -l palbociclib.sdf \
+    --autobox_ligand receptor.pdb \
+    --exhaustiveness 8 \
+    --num_modes 9 \
+    --cnn_scoring rescore \
+    -o docking_output.sdf \
+    --log docking_log.txt \
+    --seed 42
+```
+
+### Docking Results (All 9 Poses)
+
+| Mode | Affinity (kcal/mol) | Intramol (kcal/mol) | CNN Pose Score | CNN Affinity |
+|---|---|---|---|---|
+| **1 ★** | -5.83 | 0.35 | **0.3842** | 5.556 |
+| 2 | -5.99 | -0.45 | 0.3453 | 6.036 |
+| 3 | -5.34 | 0.30 | 0.3291 | 5.711 |
+| 4 | -5.44 | -0.40 | 0.2572 | 5.360 |
+| 5 | -7.17 | 1.10 | 0.1971 | 5.369 |
+| 6 | -6.34 | 1.08 | 0.1869 | 4.878 |
+| 7 | -5.87 | -0.59 | 0.1819 | 4.885 |
+| 8 | -5.59 | 0.29 | 0.1781 | 5.400 |
+| 9 | -5.86 | -0.43 | 0.1738 | 5.144 |
+
+★ **Best pose = Mode 1** (highest CNN pose score: 0.3842, affinity: −5.83 kcal/mol)
+
+### Docking Visualization (Molstar)
+
+![GNINA docking result](figures/docking_molstar.png)
+
+The **blue/teal molecule (Palbociclib)** is visible docked inside the helical core of pRb (orange). It sits within the central pocket region, consistent with engagement of the binding groove.
+
+### Interpretation
+
+- **CNN Pose Score 0.3842**: GNINA's neural network ranks this as the most geometrically plausible pose
+- **Binding Affinity −5.83 to −7.17 kcal/mol**: moderate binding range, consistent with an exploratory docking study
+- **Mode 1 vs Mode 5**: Mode 5 has a stronger Vina score (−7.17) but much lower CNN confidence (0.1971) — Mode 1 is preferred as it balances energy and pose quality
+- **Conclusion**: Palbociclib shows plausible direct engagement with the pRb pocket; its primary pharmacological mechanism remains CDK4/6 inhibition upstream of pRb
+
+**Output files:** `outputs/docking_log.txt`, `outputs/docking_output.sdf`
+
+---
+
+## Repository Structure
+
+```
+RB1_Project/
+├── README.md
+├── scripts/
+│   ├── step1_dna_sequence.py      — DNA retrieval from NCBI
+│   ├── step2_dna_to_mrna.py       — T→U mRNA conversion
+│   ├── step3_blast_protein.py     — protein sequence + BLAST summary
+│   ├── step4_alphafold2.ipynb     — AlphaFold2 workflow + report
+│   └── step5_gnina_docking.ipynb  — GNINA docking results + summary
+├── outputs/
+│   ├── RB1_DNA.fasta              — DNA sequence (from NCBI Nucleotide)
+│   ├── RB1_mRNA.fasta             — mRNA (T→U converted)
+│   ├── RB1_protein.fasta          — protein sequence (NP_000312.2)
+│   ├── RB1_BLAST_results.txt      — BLAST search summary
+│   ├── AlphaFold2_report.txt      — pLDDT + PAE analysis report
+│   ├── docking_log.txt            — GNINA docking log (all 9 poses)
+│   └── docking_output.sdf         — GNINA docked poses (SDF format)
+└── figures/
+    ├── plddt.png                  — ColabFold pLDDT per-residue plot
+    ├── pae.png                    — PAE heatmap (5 models)
+    ├── coverage.png               — MSA sequence coverage plot
+    ├── rcsb_structure.png         — 3D structure screenshot (RCSB viewer)
+    └── docking_molstar.png        — docking visualization (Molstar)
+```
+
+---
+
+## How to Run
+
+```bash
+# Install dependencies
+pip install biopython
+
+# Step 1: Download RB1 DNA from NCBI Nucleotide, save to outputs/RB1_DNA.fasta
+#         https://www.ncbi.nlm.nih.gov/nuccore/NM_000321
+python scripts/step1_dna_sequence.py
+
+# Step 2: Convert DNA to mRNA
+python scripts/step2_dna_to_mrna.py
+
+# Step 3: Generate protein FASTA and BLAST summary
+python scripts/step3_blast_protein.py
+
+# Step 4: Run AlphaFold2 via ColabFold (requires browser)
+# https://colab.research.google.com/github/sokrypton/ColabFold/blob/main/AlphaFold2.ipynb
+python scripts/step4_alphafold2.py    # writes summary report
+
+# Step 5: GNINA docking (Linux or Google Colab)
+wget https://github.com/gnina/gnina/releases/download/v1.1/gnina
+chmod +x gnina
+./gnina -r receptor.pdb -l palbociclib.sdf --autobox_ligand receptor.pdb \
+        --exhaustiveness 8 --num_modes 9 --cnn_scoring rescore \
+        -o docking_output.sdf --log docking_log.txt --seed 42
+python scripts/step5_gnina_docking.py   # prints results summary
+```
+
+---
+
+## References
+
+1. Knudson AG (1971). Mutation and cancer: statistical study of retinoblastoma. *PNAS*, 68(4):820–823.
+2. Friend SH et al. (1986). A human DNA segment with properties of the gene that predisposes to retinoblastoma. *Nature*, 323:643–646.
+3. Jumper J et al. (2021). Highly accurate protein structure prediction with AlphaFold. *Nature*, 596:583–589.
+4. Mirdita M et al. (2022). ColabFold: Making protein folding accessible to all. *Nature Methods*, 19:679–682.
+5. McNutt AT et al. (2021). GNINA 1.0: molecular docking with deep learning. *J Cheminformatics*, 13:43.
+6. UniProt Consortium (2023). UniProt: the Universal Protein knowledgebase. *NAR*, 51:D523–D531.
